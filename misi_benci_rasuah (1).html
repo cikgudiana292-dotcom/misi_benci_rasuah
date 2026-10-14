@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi Benci Rasuah - Gamifikasi Pendidikan Islam Tingkatan 4</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #064e3b 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+        .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-bounce {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-bounce:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+        .btn-bounce:active {
+            transform: translateY(1px) scale(0.98);
+        }
+        .heart-beat {
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .glow-emerald {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+        .glow-amber {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+        }
+        /* Confetti canvas overlay */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-100 selection:bg-emerald-500 selection:text-white">
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Navigation Bar -->
+    <header class="w-full bg-slate-900/80 border-b border-emerald-500/30 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-900/50">
+                    <i class="fa-solid fa-hand-holding-hand"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading text-lg md:text-xl font-bold tracking-wide text-emerald-400">MISI BENCI RASUAH</h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Pendidikan Islam Tingkatan 4 • Surah Al-Baqarah: 188</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-4">
+                <button onclick="toggleNotaModal()" class="px-3 py-1.5 rounded-lg bg-emerald-900/50 hover:bg-emerald-800/60 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-medium flex items-center gap-2 transition">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span class="hidden sm:inline">Nota Ulang Kaji</span>
+                </button>
+                <button id="sound-toggle-btn" onclick="toggleSound()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs sm:text-sm">
+                    <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Application Container -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center items-center">
+
+        <!-- SCREEN 1: WELCOME & PLAYER PROFILE SCREEN -->
+        <section id="screen-welcome" class="w-full glass-card rounded-2xl p-6 md:p-8 shadow-2xl border border-emerald-500/20 text-center max-w-2xl transition-all duration-300">
+            <div class="inline-flex p-4 rounded-full bg-emerald-500/10 text-emerald-400 mb-4 border border-emerald-500/30 glow-emerald">
+                <i class="fa-solid fa-shield-halved text-5xl"></i>
+            </div>
+            <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 mb-2">
+                Pewira Integriti
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base max-w-md mx-auto mb-6">
+                Uji kefahaman anda mengenai <span class="text-emerald-400 font-semibold">Pelajaran 4: Larangan Rasuah</span>. Selesaikan 3 tahap cabaran dan jadi Wira Bebas Rasuah!
+            </p>
+
+            <!-- Player Setup Form -->
+            <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-700/60 max-w-md mx-auto text-left mb-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Nama Murid / Pemain:</label>
+                    <input type="text" id="player-name-input" placeholder="Masukkan nama anda..." class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 text-slate-100 placeholder-slate-500 outline-none text-sm font-medium transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Pilih Karakter / Avatar:</label>
+                    <div class="grid grid-cols-4 gap-3" id="avatar-selector">
+                        <button type="button" onclick="selectAvatar('male')" data-avatar="male" class="avatar-btn p-3 rounded-xl border-2 border-emerald-500 bg-emerald-900/30 text-emerald-400 flex flex-col items-center gap-1 transition">
+                            <i class="fa-solid fa-user-graduate text-2xl"></i>
+                            <span class="text-[10px] font-bold">Pelajar L</span>
+                        </button>
+                        <button type="button" onclick="selectAvatar('female')" data-avatar="female" class="avatar-btn p-3 rounded-xl border-2 border-slate-700 bg-slate-800/40 text-slate-400 flex flex-col items-center gap-1 transition">
+                            <i class="fa-solid fa-user-nurse text-2xl"></i>
+                            <span class="text-[10px] font-bold">Pelajar P</span>
+                        </button>
+                        <button type="button" onclick="selectAvatar('detective')" data-avatar="detective" class="avatar-btn p-3 rounded-xl border-2 border-slate-700 bg-slate-800/40 text-slate-400 flex flex-col items-center gap-1 transition">
+                            <i class="fa-solid fa-user-secret text-2xl"></i>
+                            <span class="text-[10px] font-bold">Detektif</span>
+                        </button>
+                        <button type="button" onclick="selectAvatar('ustaz')" data-avatar="ustaz" class="avatar-btn p-3 rounded-xl border-2 border-slate-700 bg-slate-800/40 text-slate-400 flex flex-col items-center gap-1 transition">
+                            <i class="fa-solid fa-user-tie text-2xl"></i>
+                            <span class="text-[10px] font-bold">Ustaz/ah</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full max-w-md py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-lg shadow-lg shadow-emerald-600/30 btn-bounce flex items-center justify-center gap-3">
+                <i class="fa-solid fa-play text-xl"></i>
+                <span>Mula Cabaran Sekarang</span>
+            </button>
+        </section>
+
+        <!-- SCREEN 2: TAHAP / LEVEL MAP SCREEN -->
+        <section id="screen-levels" class="w-full glass-card rounded-2xl p-6 md:p-8 shadow-2xl border border-emerald-500/20 hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-700">
+                <div class="flex items-center gap-3">
+                    <div id="player-avatar-badge" class="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center text-xl text-white font-bold border border-emerald-400 shadow-md">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <h3 id="display-player-name" class="font-bold text-lg text-emerald-400">Pemain</h3>
+                        <p class="text-xs text-slate-400">Pilih Tahap Permainan untuk Dimulakan</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700 self-start md:self-auto">
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase text-slate-400 block font-bold">Jumlah Markah</span>
+                        <span id="total-score-badge" class="text-lg font-extrabold text-amber-400">0 BP</span>
+                    </div>
+                    <div class="h-8 w-px bg-slate-700"></div>
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase text-slate-400 block font-bold">Bintang Sejagat</span>
+                        <div class="flex text-amber-400 text-sm gap-0.5" id="total-stars-badge">
+                            <i class="fa-regular fa-star"></i>
+                            <i class="fa-regular fa-star"></i>
+                            <i class="fa-regular fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" id="levels-container">
+                <!-- Level 1 Card -->
+                <div id="level-card-1" class="bg-slate-900/90 rounded-2xl p-5 border-2 border-emerald-500/80 shadow-lg relative flex flex-col justify-between hover:border-emerald-400 transition">
+                    <div class="absolute -top-3 right-4 bg-emerald-500 text-slate-950 font-bold text-xs px-3 py-0.5 rounded-full uppercase tracking-wider">
+                        Terbuka
+                    </div>
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl font-bold mb-3 border border-emerald-500/40">
+                            1
+                        </div>
+                        <h4 class="font-heading text-lg font-bold text-slate-100">Tahap 1: Asas & Maksud Ayat</h4>
+                        <p class="text-xs text-slate-400 mt-1 mb-4">
+                            Maksud Surah Al-Baqarah:188, Pengertian Rasuah & Contoh Ambil Harta Cara Salah.
+                        </p>
+                        <div class="text-xs font-semibold text-emerald-400 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>5 Soalan • Minimum 3/5 lulus</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>Pencapaian:</span>
+                            <span id="level-1-score" class="font-bold text-amber-400">0/5</span>
+                        </div>
+                        <button onclick="startLevel(1)" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm btn-bounce flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Mula Tahap 1</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Level 2 Card -->
+                <div id="level-card-2" class="bg-slate-900/40 rounded-2xl p-5 border-2 border-slate-800 opacity-70 relative flex flex-col justify-between transition">
+                    <div id="level-2-badge" class="absolute -top-3 right-4 bg-slate-700 text-slate-300 font-bold text-xs px-3 py-0.5 rounded-full uppercase tracking-wider">
+                        <i class="fa-solid fa-lock text-[10px] mr-1"></i> Terkunci
+                    </div>
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-slate-800 text-slate-500 flex items-center justify-center text-2xl font-bold mb-3 border border-slate-700" id="level-2-num">
+                            2
+                        </div>
+                        <h4 class="font-heading text-lg font-bold text-slate-300">Tahap 2: Bentuk, Punca & Hadis</h4>
+                        <p class="text-xs text-slate-400 mt-1 mb-4">
+                            Bentuk Kesalahan Rasuah, Punca/Faktor utama & Hadis Riwayat Abu Hurairah & Ibn Umar.
+                        </p>
+                        <div class="text-xs font-semibold text-slate-400 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>5 Soalan • Minimum 3/5 lulus</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>Pencapaian:</span>
+                            <span id="level-2-score" class="font-bold text-amber-400">0/5</span>
+                        </div>
+                        <button id="level-2-btn" disabled onclick="startLevel(2)" class="w-full py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-lock"></i>
+                            <span>Kunci Dibatalkan Selepas Tahap 1</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Level 3 Card -->
+                <div id="level-card-3" class="bg-slate-900/40 rounded-2xl p-5 border-2 border-slate-800 opacity-70 relative flex flex-col justify-between transition">
+                    <div id="level-3-badge" class="absolute -top-3 right-4 bg-slate-700 text-slate-300 font-bold text-xs px-3 py-0.5 rounded-full uppercase tracking-wider">
+                        <i class="fa-solid fa-lock text-[10px] mr-1"></i> Terkunci
+                    </div>
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-slate-800 text-slate-500 flex items-center justify-center text-2xl font-bold mb-3 border border-slate-700" id="level-3-num">
+                            3
+                        </div>
+                        <h4 class="font-heading text-lg font-bold text-slate-300">Tahap 3: Kesan, Langkah & Pengajaran</h4>
+                        <p class="text-xs text-slate-400 mt-1 mb-4">
+                            Kesan kepada Individu, Masyarakat, Negara, Langkah Membanteras & Pengajaran Ayat.
+                        </p>
+                        <div class="text-xs font-semibold text-slate-400 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>5 Soalan • Minimum 3/5 lulus</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>Pencapaian:</span>
+                            <span id="level-3-score" class="font-bold text-amber-400">0/5</span>
+                        </div>
+                        <button id="level-3-btn" disabled onclick="startLevel(3)" class="w-full py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-lock"></i>
+                            <span>Kunci Dibatalkan Selepas Tahap 2</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-emerald-950/40 p-4 rounded-xl border border-emerald-500/30 flex items-center justify-between text-xs sm:text-sm text-emerald-300">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-xl text-emerald-400"></i>
+                    <span><strong>Petunjuk:</strong> Dapatkan sekurang-kurangnya 3 soalan betul untuk membuka tahap berikutnya.</span>
+                </div>
+                <button onclick="resetGameProgress()" class="text-xs text-slate-400 underline hover:text-rose-400 transition ml-2">Reset Semula</button>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: GAMEPLAY / QUIZ SCREEN -->
+        <section id="screen-gameplay" class="w-full glass-card rounded-2xl p-5 md:p-8 shadow-2xl border border-emerald-500/20 hidden">
+            <!-- HUD Top Bar -->
+            <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-700/80">
+                <!-- Level Info -->
+                <div class="flex items-center gap-3">
+                    <button onclick="quitToLevels()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition text-xs" title="Kembali ke Pilihan Tahap">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <span id="gameplay-level-tag" class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
+                            Tahap 1
+                        </span>
+                        <h3 id="gameplay-level-title" class="font-heading font-bold text-sm sm:text-base text-slate-100">
+                            Asas & Maksud Ayat
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Lives & Score Stats -->
+                <div class="flex items-center gap-4">
+                    <!-- Lives HUD -->
+                    <div class="flex items-center gap-1 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-rose-900/50">
+                        <span class="text-xs text-slate-400 mr-1 hidden sm:inline">Nyawa:</span>
+                        <div id="lives-container" class="flex items-center gap-1 text-rose-500 text-sm">
+                            <i class="fa-solid fa-heart heart-beat"></i>
+                            <i class="fa-solid fa-heart heart-beat"></i>
+                            <i class="fa-solid fa-heart heart-beat"></i>
+                        </div>
+                    </div>
+
+                    <!-- Score HUD -->
+                    <div class="bg-slate-900/80 px-3 py-1.5 rounded-xl border border-amber-900/50 text-right">
+                        <span class="text-[10px] uppercase text-slate-400 block font-bold">Markah</span>
+                        <span id="gameplay-score" class="text-base font-extrabold text-amber-400">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between text-xs text-slate-400 mb-1.5 font-medium">
+                    <span id="question-progress-text">Soalan 1 daripada 5</span>
+                    <span id="streak-indicator" class="text-amber-400 font-bold hidden"><i class="fa-solid fa-fire mr-1"></i> Combo x<span id="streak-count">1</span></span>
+                </div>
+                <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                    <div id="question-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-300" style="width: 20%;"></div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div id="question-card" class="bg-slate-900/80 rounded-xl p-5 md:p-6 border border-slate-700/80 mb-6 shadow-inner">
+                <div id="arabic-quote-box" class="hidden mb-4 p-4 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-center">
+                    <p id="arabic-text" class="text-lg md:text-2xl font-serif text-emerald-300 leading-relaxed dir-rtl mb-1">
+                        وَلَا تَأْكُلُوا أَمْوَالَكُم بَيْنَكُم بِالْبَاطِلِ...
+                    </p>
+                    <span class="text-[11px] text-emerald-400/80 font-medium">(Surah Al-Baqarah: Ayat 188)</span>
+                </div>
+
+                <span id="question-category" class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide bg-slate-800 text-teal-300 border border-slate-700 mb-2">
+                    Kategori Soalan
+                </span>
+                <h2 id="question-text" class="text-base sm:text-lg md:text-xl font-semibold text-slate-100 leading-snug">
+                    Teks soalan akan terpapar di sini...
+                </h2>
+            </div>
+
+            <!-- Answer Options Grid -->
+            <div id="options-container" class="grid grid-cols-1 gap-3 mb-6">
+                <!-- Dynamic Options Buttons Rendered Here -->
+            </div>
+
+            <!-- Feedback Area (Initially Hidden) -->
+            <div id="feedback-card" class="hidden rounded-xl p-4 md:p-5 border mb-6 transition-all">
+                <div class="flex items-start gap-3">
+                    <div id="feedback-icon" class="w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 mt-0.5">
+                        <!-- Icon dynamically injected -->
+                    </div>
+                    <div class="flex-grow">
+                        <h4 id="feedback-title" class="font-bold text-base md:text-lg mb-1">Syabas! Jawapan Tepat</h4>
+                        <p id="feedback-explanation" class="text-xs sm:text-sm text-slate-200 leading-relaxed mb-3">
+                            Penerangan jawapan berdasarkan buku teks / infografik.
+                        </p>
+                        <div id="motivation-box" class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-700/60 text-xs italic text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-quote-left text-amber-400 shrink-0"></i>
+                            <span id="motivation-text">"Pendidikan tanpa integriti adalah bahaya kepada masyarakat."</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button id="next-question-btn" onclick="nextQuestion()" class="py-2.5 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm btn-bounce flex items-center gap-2">
+                        <span>Soalan Seterusnya</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: TAHAP SELESAI / END GAME SCREEN -->
+        <section id="screen-summary" class="w-full glass-card rounded-2xl p-6 md:p-8 shadow-2xl border border-emerald-500/20 text-center hidden">
+            <div id="summary-badge-icon" class="w-20 h-20 mx-auto rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-4xl mb-4 border-2 border-emerald-400 shadow-xl glow-emerald">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+
+            <h2 id="summary-title" class="font-heading text-2xl sm:text-3xl font-extrabold text-emerald-400 mb-1">
+                Tahap Selesai!
+            </h2>
+            <p id="summary-subtitle" class="text-slate-300 text-xs sm:text-sm mb-6">
+                Tahniah! Anda telah melengkapkan cabaran tahap ini dengan jayanya.
+            </p>
+
+            <!-- Stars display -->
+            <div id="summary-stars" class="flex justify-center gap-2 text-3xl text-amber-400 mb-6">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <!-- Score Stats Box -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/80 p-4 rounded-xl border border-slate-700 mb-6 text-center">
+                <div class="p-2">
+                    <span class="text-[10px] uppercase text-slate-400 block font-bold">Skor Betul</span>
+                    <span id="summary-score-ratio" class="text-lg font-extrabold text-emerald-400">5 / 5</span>
+                </div>
+                <div class="p-2 border-l border-slate-800">
+                    <span class="text-[10px] uppercase text-slate-400 block font-bold">Peratusan</span>
+                    <span id="summary-percentage" class="text-lg font-extrabold text-teal-300">100%</span>
+                </div>
+                <div class="p-2 border-l border-slate-800">
+                    <span class="text-[10px] uppercase text-slate-400 block font-bold">Markah Tahap</span>
+                    <span id="summary-level-points" class="text-lg font-extrabold text-amber-400">+500 BP</span>
+                </div>
+                <div class="p-2 border-l border-slate-800">
+                    <span class="text-[10px] uppercase text-slate-400 block font-bold">Status Tahap</span>
+                    <span id="summary-status-text" class="text-xs font-bold text-emerald-400 uppercase mt-1 block">LULUS</span>
+                </div>
+            </div>
+
+            <!-- Motivational Banner -->
+            <div class="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm mb-6 flex items-center gap-3 text-left">
+                <i class="fa-solid fa-award text-2xl text-amber-400 shrink-0"></i>
+                <div>
+                    <span class="font-bold block text-amber-300" id="summary-quote-title">Pentingnya Integriti:</span>
+                    <p id="summary-quote-body">
+                        "Rasulullah SAW melaknat pemberi dan penerima rasuah. Teruskan amalan jujur dan telus dalam kehidupan harian anda!"
+                    </p>
+                </div>
+            </div>
+
+            <!-- Buttons Grid -->
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="goToLevelMap()" class="py-3 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm border border-slate-700 btn-bounce flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-map"></i>
+                    <span>Peta Tahap</span>
+                </button>
+                <button id="summary-next-btn" onclick="nextLevelFromSummary()" class="py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm btn-bounce flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30">
+                    <span>Teruskan Ke Tahap Seterusnya</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: NOTA ULANG KAJI INTERAKTIF (BASED ON INFOGRAPHIC) -->
+    <div id="nota-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card max-w-3xl w-full max-h-[85vh] rounded-2xl border border-emerald-500/40 shadow-2xl flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div class="p-4 sm:p-5 bg-slate-900 border-b border-slate-700 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
+                        <i class="fa-solid fa-book-bookmark text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-bold text-slate-100 text-base sm:text-lg">Nota Ulang Kaji Ringkas</h3>
+                        <p class="text-xs text-slate-400">Pelajaran 4: Larangan Rasuah (Surah Al-Baqarah: Ayat 188)</p>
+                    </div>
+                </div>
+                <button onclick="toggleNotaModal()" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content - Expandable/Accordion Notes -->
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs sm:text-sm text-slate-200">
+                <!-- Section 1: Ayat & Maksud -->
+                <div class="bg-slate-900/80 rounded-xl p-4 border border-emerald-500/30">
+                    <h4 class="font-bold text-emerald-400 text-sm sm:text-base mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-quran"></i> Ayat & Maksud (Surah Al-Baqarah: 188)
+                    </h4>
+                    <p class="font-serif text-base sm:text-lg text-emerald-200 text-right dir-rtl mb-2">
+                        وَلَا تَأْكُلُوا أَمْوَالَكُم بَيْنَكُم بِالْبَاطِلِ وَتُدْلُوا بِهَا إِلَى الْحُكَّامِ لِتَأْكُلُوا فَرِيقًا مِّنْ أَمْوَالِ النَّاسِ بِالْإِثْمِ وَأَنتُمْ تَعْلَمُونَ
+                    </p>
+                    <p class="text-slate-300 italic text-xs leading-relaxed">
+                        "Dan janganlah kamu makan (atau mengambil) harta (orang lain) antara kamu dengan jalan yang salah dan jangan pula kamu memberikan rasuah kepada para hakim kerana hendak memakan sebahagian daripada harta manusia dengan dosa sedangkan kamu mengetahui salahnya."
+                    </p>
+                </div>
+
+                <!-- Grid 2 Columns for quick facts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Pengertian Rasuah -->
+                    <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700">
+                        <h5 class="font-bold text-amber-400 mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-exclamation"></i> Pengertian Rasuah
+                        </h5>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Sebarang <strong>pemberian atau suapan</strong> yang bertujuan <strong>memalsukan kebenaran</strong> dan <strong>membenarkan kepalsuan</strong>.
+                        </p>
+                    </div>
+
+                    <!-- Spektrum Ilmu Hadis -->
+                    <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700">
+                        <h5 class="font-bold text-amber-400 mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-scroll"></i> Spektrum Ilmu (Hadis)
+                        </h5>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Dari Abu Hurairah RA & Abdullah bin Umar RA: <em>"Rasulullah SAW melaknat orang yang memberikan dan menerima rasuah."</em>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Bentuk Kesalahan & Contoh -->
+                <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700">
+                    <h5 class="font-bold text-teal-300 mb-2">Bentuk-bentuk Kesalahan Rasuah:</h5>
+                    <ul class="list-disc list-inside space-y-1 text-xs text-slate-300">
+                        <li>Meminta atau menerima rasuah</li>
+                        <li>Menawarkan atau memberikan rasuah</li>
+                        <li>Mengemukakan tuntutan palsu</li>
+                        <li>Menyalahgunakan kedudukan atau jawatan untuk kepentingan tertentu</li>
+                    </ul>
+                </div>
+
+                <!-- Punca / Faktor -->
+                <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700">
+                    <h5 class="font-bold text-rose-300 mb-2">Faktor / Punca Perbuatan Rasuah:</h5>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                        <span class="bg-rose-950/40 border border-rose-800/40 px-2 py-1 rounded text-rose-200">1. Lemah iman</span>
+                        <span class="bg-rose-950/40 border border-rose-800/40 px-2 py-1 rounded text-rose-200">2. Jahil ilmu agama</span>
+                        <span class="bg-rose-950/40 border border-rose-800/40 px-2 py-1 rounded text-rose-200">3. Ingin cepat kaya</span>
+                        <span class="bg-rose-950/40 border border-rose-800/40 px-2 py-1 rounded text-rose-200">4. Terpengaruh kemewahan</span>
+                        <span class="bg-rose-950/40 border border-rose-800/40 px-2 py-1 rounded text-rose-200 font-medium">5. Tamak haloba & nafsu</span>
+                    </div>
+                </div>
+
+                <!-- Kesan 3 Kategori -->
+                <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-700">
+                    <h5 class="font-bold text-emerald-400 mb-2">Kesan Perbuatan Rasuah:</h5>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-slate-800/60 p-2.5 rounded-lg">
+                            <span class="font-bold text-amber-300 block mb-1">Kepada Individu:</span>
+                            • Dilaknat Allah & Rasul<br>
+                            • Hilang harga diri & azab akhirat<br>
+                            • Didenda, dipenjara & rezeki tak berkat
+                        </div>
+                        <div class="bg-slate-800/60 p-2.5 rounded-lg">
+                            <span class="font-bold text-amber-300 block mb-1">Kepada Masyarakat:</span>
+                            • Kes jenayah meningkat<br>
+                            • Masyarakat mundur & dizalimi<br>
+                            • Hidup dalam ketakutan & huru-hara
+                        </div>
+                        <div class="bg-slate-800/60 p-2.5 rounded-lg">
+                            <span class="font-bold text-amber-300 block mb-1">Kepada Negara:</span>
+                            • Ekonomi melumpuh<br>
+                            • Maruah negara runtuh<br>
+                            • Pelabur luar hilang minat
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-slate-900 border-t border-slate-700 text-right">
+                <button onclick="toggleNotaModal()" class="px-5 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs sm:text-sm hover:bg-emerald-400 transition">
+                    Faham & Tutup Nota
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* Web Audio API Sound Synthesizer (No external audio file dependencies) */
+        let audioCtx = null;
+        let isSoundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!isSoundEnabled) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    // Ascending cheerful chime
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    // Low buzz
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(90, now + 0.25);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'levelComplete') {
+                    // Arpeggio fanfare
+                    [440, 554.37, 659.25, 880].forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        g.gain.setValueAtTime(0.2, now + idx * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.3);
+                        o.start(now + idx * 0.1);
+                        o.stop(now + idx * 0.1 + 0.3);
+                    });
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                }
+            } catch (e) {
+                console.log('Audio play note:', e);
+            }
+        }
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (isSoundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-rose-400';
+            }
+        }
+
+        // QUESTION BANK (15 Questions split across 3 Levels - 5 questions each)
+        const gameQuestions = {
+            level1: [
+                {
+                    id: 'l1_q1',
+                    category: 'Ayat & Surah',
+                    showQuran: true,
+                    question: 'Ayat 188 daripada Surah Al-Baqarah menekankan secara khusus tentang larangan apakah dalam Islam?',
+                    options: [
+                        'Larangan memakan makanan tidak halal',
+                        'Larangan mengambil harta secara salah dan memberi rasuah kepada hakim',
+                        'Larangan melakukan amalan riba dalam perniagaan sahaja',
+                        'Larangan ingkar kepada arahan kedua ibu bapa'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Surah Al-Baqarah ayat 188 melarang umat Islam memakan/mengambil harta orang lain secara salah dan melarang memberikan rasuah kepada para hakim.',
+                    motivation: 'Al-Quran adalah panduan utama hidup. Jauhi larangan Allah untuk keberkatan!'
+                },
+                {
+                    id: 'l1_q2',
+                    category: 'Pengertian Rasuah',
+                    showQuran: false,
+                    question: 'Apakah maksud "Rasuah" mengikut istilah pelajaran ini?',
+                    options: [
+                        'Pemberian ikhlas tanpa meminta sebarang balasan duniawi',
+                        'Sebarang pemberian atau suapan bertujuan memalsukan kebenaran dan membenarkan kepalsuan',
+                        'Hadiah yang diberikan kepada guru pada Hari Guru',
+                        'Pinjaman wang sesama rakan tanpa faedah'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Rasuah bermaksud sebarang pemberian atau suapan yang bertujuan memalsukan kebenaran dan membenarkan kepalsuan.',
+                    motivation: 'Kejujuran adalah perisai paling utuh seorang pejuang integriti!'
+                },
+                {
+                    id: 'l1_q3',
+                    category: 'Larangan Allah',
+                    showQuran: false,
+                    question: 'Berikut merupakan contoh mengambil harta orang lain dengan cara yang salah KECUALI:',
+                    options: [
+                        'Menipu dan merompak',
+                        'Judi dan Riba',
+                        'Berniaga secara jujur dan telus',
+                        'Salah guna kuasa dan mencuri'
+                    ],
+                    correctIndex: 2,
+                    explanation: 'Berniaga secara jujur dan telus adalah rezeki yang halal dan dituntut dalam Islam, bukannya cara yang salah.',
+                    motivation: 'Rezeki yang halal membawa ketenangan dan keberkatan hidup keluarga!'
+                },
+                {
+                    id: 'l1_q4',
+                    category: 'Kefahaman Ayat',
+                    showQuran: false,
+                    question: 'Mengapakah Allah melarang perbuatan memberikan rasuah kepada para hakim?',
+                    options: [
+                        'Kerana hendak memakan sebahagian daripada harta manusia dengan dosa sedangkan mengetahui salahnya',
+                        'Kerana hakim tidak boleh menerima apa-apa hadiah sepanjang hayat',
+                        'Kerana ia akan mengurangkan pendapatan kewangan negara',
+                        'Kerana ia memenatkan proses perbicaraan di mahkamah'
+                    ],
+                    correctIndex: 0,
+                    explanation: 'Menurut ayat 188 Surah Al-Baqarah, memberikan rasuah kepada hakim dilarang kerana hendak mengambil harta manusia secara berdosa sedangkan mengetahui salahnya.',
+                    motivation: 'Keadilan tidak boleh dibeli dengan wang ringgit!'
+                },
+                {
+                    id: 'l1_q5',
+                    category: 'Contoh Rasuah',
+                    showQuran: false,
+                    question: 'Ahmad memberikan wang kepada pihak berkuasa agar kesalahan memandu melanggar lampu merah tidak disaman. Ini merupakan contoh:',
+                    options: [
+                        'Memalsukan Kebenaran',
+                        'Amalan Sedekah Subuh',
+                        'Pertolongan kecemasan',
+                        'Membayar cukai jalan'
+                    ],
+                    correctIndex: 0,
+                    explanation: 'Memberikan rasuah agar rahsia atau kesalahan disimpan supaya kebenaran tidak dibongkar adalah contoh memalsukan kebenaran.',
+                    motivation: 'Berani mengakui kesalahan adalah tanda anak muda yang berintegriti!'
+                }
+            ],
+            level2: [
+                {
+                    id: 'l2_q1',
+                    category: 'Bentuk Kesalahan',
+                    showQuran: false,
+                    question: 'Antara berikut, yang manakah BUKAN bentuk kesalahan rasuah?',
+                    options: [
+                        'Meminta atau menerima rasuah',
+                        'Menawarkan atau memberikan rasuah',
+                        'Mengemukakan tuntutan palsu',
+                        'Melaporkan salah guna kuasa kepada pihak SPRM'
+                    ],
+                    correctIndex: 3,
+                    explanation: 'Melaporkan perbuatan rasuah kepada pihak berkuasa (seperti SPRM) adalah tindakan terpuji dan tanggungjawab warganegara, bukan kesalahan.',
+                    motivation: 'Jadilah wira bersuara! Laporkan rasuah demi kebaikan bersama.'
+                },
+                {
+                    id: 'l2_q2',
+                    category: 'Hadis Nabawi',
+                    showQuran: false,
+                    question: 'Apakah tindakan Rasulullah SAW terhadap orang yang memberikan dan menerima rasuah menurut hadis riwayat Abu Hurairah RA dan Abdullah bin Umar RA?',
+                    options: [
+                        'Baginda memaafkan mereka tanpa syarat',
+                        'Rasulullah SAW MELAKNAT orang yang memberikan dan menerima rasuah',
+                        'Baginda membiarkan perkara tersebut kepada pihak mahkamah',
+                        'Baginda memberi nasihat sekali sahaja'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Hadis meriwayatkan bahawa "Rasulullah SAW melaknat orang yang memberikan dan menerima rasuah."',
+                    motivation: 'Jauhi laknat Allah dan Rasul dengan menjauhi rasuah!'
+                },
+                {
+                    id: 'l2_q3',
+                    category: 'Faktor Rasuah',
+                    showQuran: false,
+                    question: 'Apakah faktor / punca UTAMA seseorang terdorong melakukan kesalahan rasuah?',
+                    options: [
+                        'Lemah iman dan jahil ilmu pengetahuan agama',
+                        'Terlalu banyak ilmu agama',
+                        'Banyak melakukan amalan kebajikan',
+                        'Suka hidup bersederhana'
+                    ],
+                    correctIndex: 0,
+                    explanation: 'Punca rasuah termasuklah lemah iman, jahil ilmu agama, ingin cepat kaya, terpengaruh kemewahan hidup dan hawa nafsu.',
+                    motivation: 'Mantapkan iman dan mantapkan ilmu agama sebagai benteng diri!'
+                },
+                {
+                    id: 'l2_q4',
+                    category: 'Spektrum Ilmu',
+                    showQuran: false,
+                    question: 'Seorang kontraktor memberikan wang rasuah untuk meluluskan tender binaan sehingga menutup peluang orang lain yang lebih layak. Ini contoh perbuatan:',
+                    options: [
+                        'Membenarkan Kepalsuan',
+                        'Memalsukan Kebenaran',
+                        'Menderma harta',
+                        'Tolong-menolong dalam kebaikan'
+                    ],
+                    correctIndex: 0,
+                    explanation: 'Membenarkan kepalsuan merangkumi tindakan memberikan rasuah untuk meluluskan tender sehingga menzalimi orang lain yang layak.',
+                    motivation: 'Hak orang yang layak mesti dipertahankan!'
+                },
+                {
+                    id: 'l2_q5',
+                    category: 'Bentuk Kesalahan',
+                    showQuran: false,
+                    question: 'Seseorang pegawai menuntut bayaran elaun perjalanan rasmi sedangkan beliau tidak pernah pergi ke lokasi tersebut. Kesalahan ini tergolong dalam:',
+                    options: [
+                        'Mengemukakan tuntutan palsu',
+                        'Meminta hadiah hari lahir',
+                        'Pinjaman wang persendirian',
+                        'Bayaran zakat harta'
+                    ],
+                    correctIndex: 0,
+                    explanation: 'Mengemukakan dokumen atau tuntutan kewangan yang tidak benar adalah salah satu bentuk kesalahan rasuah (tuntutan palsu).',
+                    motivation: 'Setiap sen rezeki yang masuk ke badan akan dipersoalkan di akhirat!'
+                }
+            ],
+            level3: [
+                {
+                    id: 'l3_q1',
+                    category: 'Kesan Individu',
+                    showQuran: false,
+                    question: 'Apakah kesan buruk perbuatan rasuah khusus kepada INDIVIDU yang melakukannya?',
+                    options: [
+                        'Dinaikkan pangkat dengan serta-merta oleh majikan',
+                        'Hidup tidak diberkati Allah SWT kerana memakan hasil yang haram',
+                        'Mendapat pujian daripada masyarakat sekeliling',
+                        'Meningkatkan taraf ekonomi negara'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Kesan kepada individu: Allah & Rasul melaknatnya, hilang harga diri, mendapat azab akhirat, didenda/dipenjara & rezeki tidak berkat.',
+                    motivation: 'Harta haram hanya membawa gelisah, rezeki halal membawa bahagia.'
+                },
+                {
+                    id: 'l3_q2',
+                    category: 'Kesan Negara',
+                    showQuran: false,
+                    question: 'Apakah dampak negatif perbuatan rasuah terhadap sesebuah NEGARA?',
+                    options: [
+                        'Pelabur luar semakin ramai melabur',
+                        'Melumpuhkan ekonomi negara dan pembangunan projek tidak berkualiti',
+                        'Maruah negara semakin disanjung tinggi di mata dunia',
+                        'Kadar jenayah semakin berkurangan'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Rasuah melumpuhkan ekonomi negara, meruntuhkan maruah di mata dunia, menakutkan pelabur luar, dan menyebabkan projek pembangunan tidak berkualiti.',
+                    motivation: 'Sayangi negara kita! Pertahankan integriti ibu pertiwi.'
+                },
+                {
+                    id: 'l3_q3',
+                    category: 'Langkah Mengatasi',
+                    showQuran: false,
+                    question: 'Bagaimanakah peranan masyarakat dalam usaha membanteras gejala rasuah?',
+                    options: [
+                        'Berdiam diri apabila melihat salah guna kuasa',
+                        'Melaporkan sebarang aktiviti rasuah kepada pihak berkuasa & mengadakan kempen kesedaran',
+                        'Membantu menyembunyikan maklumat pemberi rasuah',
+                        'Memberi ganjaran kepada pelaku rasuah'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Masyarakat berperanan melaporkan sebarang aktiviti rasuah kepada pihak berkuasa dan mengadakan kempen kesedaran membenci rasuah.',
+                    motivation: 'Masyarakat yang peka adalah perisai negara yang kuat!'
+                },
+                {
+                    id: 'l3_q4',
+                    category: 'Pengajaran Ayat',
+                    showQuran: false,
+                    question: 'Berikut merupakan Pengajaran Ayat daripada Surah Al-Baqarah: 188 KECUALI:',
+                    options: [
+                        'Kita hendaklah mencari rezeki yang halal agar tidak menyalahi syariat Islam',
+                        'Kita hendaklah menjauhkan diri daripada memberikan rasuah supaya tidak menzalimi diri',
+                        'Kita harus mengelakkan diri daripada melakukan sumpah palsu',
+                        'Kita dibenarkan mengambil harta orang lain jika tidak diketahui sesiapa'
+                    ],
+                    correctIndex: 3,
+                    explanation: 'Mengambil harta orang lain secara sembunyi tetap haram dan berdosa di sisi Allah SWT.',
+                    motivation: 'Allah Maha Melihat dan Maha Mengetahui setiap amalan hamba-Nya!'
+                },
+                {
+                    id: 'l3_q5',
+                    category: 'Pengajaran Ayat',
+                    showQuran: false,
+                    question: 'Slogan yang manakah meringkaskan seruan utama pengajaran ayat ini?',
+                    options: [
+                        '"Cepat Kaya, Bebas Cukai"',
+                        '"Rasuah Merosakkan Diri, Masyarakat Dan Negara. Tolak Rasuah, Pilih Integriti!"',
+                        '"Biar Papa Asal Bergaya"',
+                        '"Harta Banyak Kesenangan Utama"'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Mesej utama penutup infografik: "Rasuah merosakkan diri, masyarakat dan negara. Tolak rasuah, pilih integriti!"',
+                    motivation: 'Tahniah! Anda adalah Generasi Celik Integriti Kebanggaan Agama dan Negara!'
+                }
+            ]
+        };
+
+        // GAME STATE
+        let playerProfile = {
+            name: 'Murid Integriti',
+            avatar: 'male',
+            totalScore: 0,
+            unlockedLevel: 1,
+            levelScores: { 1: 0, 2: 0, 3: 0 },
+            levelStars: { 1: 0, 2: 0, 3: 0 }
+        };
+
+        let currentLevel = 1;
+        let currentQuestionIdx = 0;
+        let currentQuestionsList = [];
+        let lives = 3;
+        let levelScore = 0;
+        let streak = 0;
+        let isAnswered = false;
+
+        // AVATAR SELECTION
+        function selectAvatar(avatarType) {
+            playerProfile.avatar = avatarType;
+            document.querySelectorAll('.avatar-btn').forEach(btn => {
+                if (btn.dataset.avatar === avatarType) {
+                    btn.classList.add('border-emerald-500', 'bg-emerald-900/30', 'text-emerald-400');
+                    btn.classList.remove('border-slate-700', 'bg-slate-800/40', 'text-slate-400');
+                } else {
+                    btn.classList.remove('border-emerald-500', 'bg-emerald-900/30', 'text-emerald-400');
+                    btn.classList.add('border-slate-700', 'bg-slate-800/40', 'text-slate-400');
+                }
+            });
+            playSound('click');
+        }
+
+        // NAVIGATION BETWEEN SCREENS
+        function showScreen(screenId) {
+            ['screen-welcome', 'screen-levels', 'screen-gameplay', 'screen-summary'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startGame() {
+            playSound('click');
+            const nameInput = document.getElementById('player-name-input').value.trim();
+            if (nameInput) {
+                playerProfile.name = nameInput;
+            } else {
+                playerProfile.name = 'Wira Integriti';
+            }
+
+            // Update UI elements for player
+            document.getElementById('display-player-name').innerText = playerProfile.name;
+            updateAvatarBadge();
+            updateLevelMapUI();
+            showScreen('screen-levels');
+        }
+
+        function updateAvatarBadge() {
+            const badge = document.getElementById('player-avatar-badge');
+            let iconClass = 'fa-user-graduate';
+            if (playerProfile.avatar === 'female') iconClass = 'fa-user-nurse';
+            if (playerProfile.avatar === 'detective') iconClass = 'fa-user-secret';
+            if (playerProfile.avatar === 'ustaz') iconClass = 'fa-user-tie';
+
+            badge.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+        }
+
+        function updateLevelMapUI() {
+            document.getElementById('total-score-badge').innerText = `${playerProfile.totalScore} BP`;
+
+            // Update Stars display on Level selection map
+            let totalStarsHTML = '';
+            let sumStars = playerProfile.levelStars[1] + playerProfile.levelStars[2] + playerProfile.levelStars[3];
+            for (let i = 0; i < 3; i++) {
+                if (i < sumStars) {
+                    totalStarsHTML += '<i class="fa-solid fa-star text-amber-400"></i>';
+                } else {
+                    totalStarsHTML += '<i class="fa-regular fa-star text-slate-600"></i>';
+                }
+            }
+            document.getElementById('total-stars-badge').innerHTML = totalStarsHTML;
+
+            // Level 1 score text
+            document.getElementById('level-1-score').innerText = `${playerProfile.levelScores[1]}/5`;
+
+            // Level 2 Card unlock state
+            const lvl2Card = document.getElementById('level-card-2');
+            const lvl2Btn = document.getElementById('level-2-btn');
+            const lvl2Badge = document.getElementById('level-2-badge');
+            const lvl2Num = document.getElementById('level-2-num');
+            document.getElementById('level-2-score').innerText = `${playerProfile.levelScores[2]}/5`;
+
+            if (playerProfile.unlockedLevel >= 2) {
+                lvl2Card.classList.remove('opacity-70', 'bg-slate-900/40');
+                lvl2Card.classList.add('bg-slate-900/90', 'border-emerald-500/80');
+                lvl2Badge.className = 'absolute -top-3 right-4 bg-emerald-500 text-slate-950 font-bold text-xs px-3 py-0.5 rounded-full uppercase tracking-wider';
+                lvl2Badge.innerHTML = 'Terbuka';
+                lvl2Num.className = 'w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl font-bold mb-3 border border-emerald-500/40';
+                lvl2Btn.disabled = false;
+                lvl2Btn.className = 'w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm btn-bounce flex items-center justify-center gap-2 cursor-pointer';
+                lvl2Btn.innerHTML = '<i class="fa-solid fa-play"></i><span>Mula Tahap 2</span>';
+            }
+
+            // Level 3 Card unlock state
+            const lvl3Card = document.getElementById('level-card-3');
+            const lvl3Btn = document.getElementById('level-3-btn');
+            const lvl3Badge = document.getElementById('level-3-badge');
+            const lvl3Num = document.getElementById('level-3-num');
+            document.getElementById('level-3-score').innerText = `${playerProfile.levelScores[3]}/5`;
+
+            if (playerProfile.unlockedLevel >= 3) {
+                lvl3Card.classList.remove('opacity-70', 'bg-slate-900/40');
+                lvl3Card.classList.add('bg-slate-900/90', 'border-emerald-500/80');
+                lvl3Badge.className = 'absolute -top-3 right-4 bg-emerald-500 text-slate-950 font-bold text-xs px-3 py-0.5 rounded-full uppercase tracking-wider';
+                lvl3Badge.innerHTML = 'Terbuka';
+                lvl3Num.className = 'w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl font-bold mb-3 border border-emerald-500/40';
+                lvl3Btn.disabled = false;
+                lvl3Btn.className = 'w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm btn-bounce flex items-center justify-center gap-2 cursor-pointer';
+                lvl3Btn.innerHTML = '<i class="fa-solid fa-play"></i><span>Mula Tahap 3</span>';
+            }
+        }
+
+        function startLevel(lvlNum) {
+            playSound('click');
+            currentLevel = lvlNum;
+            currentQuestionIdx = 0;
+            lives = 3;
+            levelScore = 0;
+            streak = 0;
+            isAnswered = false;
+
+            if (lvlNum === 1) currentQuestionsList = [...gameQuestions.level1];
+            if (lvlNum === 2) currentQuestionsList = [...gameQuestions.level2];
+            if (lvlNum === 3) currentQuestionsList = [...gameQuestions.level3];
+
+            // Set HUD titles
+            document.getElementById('gameplay-level-tag').innerText = `Tahap ${lvlNum}`;
+            const titles = { 1: 'Asas & Maksud Ayat', 2: 'Bentuk, Punca & Hadis', 3: 'Kesan, Langkah & Pengajaran' };
+            document.getElementById('gameplay-level-title').innerText = titles[lvlNum];
+
+            updateLivesDisplay();
+            document.getElementById('gameplay-score').innerText = playerProfile.totalScore;
+
+            showScreen('screen-gameplay');
+            loadQuestion();
+        }
+
+        function updateLivesDisplay() {
+            const container = document.getElementById('lives-container');
+            let heartsHTML = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < lives) {
+                    heartsHTML += '<i class="fa-solid fa-heart heart-beat text-rose-500"></i>';
+                } else {
+                    heartsHTML += '<i class="fa-regular fa-heart text-slate-600"></i>';
+                }
+            }
+            container.innerHTML = heartsHTML;
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            document.getElementById('feedback-card').classList.add('hidden');
+
+            const qData = currentQuestionsList[currentQuestionIdx];
+
+            // Progress bar
+            const totalQ = currentQuestionsList.length;
+            const progressPercent = ((currentQuestionIdx + 1) / totalQ) * 100;
+            document.getElementById('question-progress-bar').style.width = `${progressPercent}%`;
+            document.getElementById('question-progress-text').innerText = `Soalan ${currentQuestionIdx + 1} daripada ${totalQ}`;
+
+            // Category & Question
+            document.getElementById('question-category').innerText = qData.category;
+            document.getElementById('question-text').innerText = qData.question;
+
+            // Arabic quote box toggle
+            const arabicBox = document.getElementById('arabic-quote-box');
+            if (qData.showQuran) {
+                arabicBox.classList.remove('hidden');
+            } else {
+                arabicBox.classList.add('hidden');
+            }
+
+            // Options Buttons
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const optionLabels = ['A', 'B', 'C', 'D'];
+            qData.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-4 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 text-left flex items-start gap-3 transition btn-bounce group';
+                btn.onclick = () => selectOption(idx);
+                btn.id = `opt-btn-${idx}`;
+
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg bg-slate-700 group-hover:bg-emerald-500 group-hover:text-slate-950 text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0 transition">
+                        ${optionLabels[idx]}
+                    </span>
+                    <span class="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed pt-0.5">
+                        ${optText}
+                    </span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Streak indicator
+            const streakInd = document.getElementById('streak-indicator');
+            if (streak > 1) {
+                streakInd.classList.remove('hidden');
+                document.getElementById('streak-count').innerText = streak;
+            } else {
+                streakInd.classList.add('hidden');
+            }
+        }
+
+        function selectOption(selectedIndex) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const qData = currentQuestionsList[currentQuestionIdx];
+            const isCorrect = (selectedIndex === qData.correctIndex);
+
+            // Highlight chosen button
+            const optionsContainer = document.getElementById('options-container');
+            const buttons = optionsContainer.querySelectorAll('button');
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-slate-700/90');
+                if (idx === qData.correctIndex) {
+                    btn.className = 'w-full p-4 rounded-xl bg-emerald-950/80 border-2 border-emerald-500 text-left flex items-start gap-3 transition';
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.className = 'w-full p-4 rounded-xl bg-rose-950/80 border-2 border-rose-500 text-left flex items-start gap-3 transition';
+                } else {
+                    btn.className += ' opacity-50';
+                }
+            });
+
+            // Feedback Card Elements
+            const feedbackCard = document.getElementById('feedback-card');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackExp = document.getElementById('feedback-explanation');
+            const motivationText = document.getElementById('motivation-text');
+
+            if (isCorrect) {
+                playSound('correct');
+                streak++;
+                levelScore++;
+                const bonusPoints = 100 + (streak > 1 ? (streak - 1) * 20 : 0);
+                playerProfile.totalScore += bonusPoints;
+                document.getElementById('gameplay-score').innerText = playerProfile.totalScore;
+
+                feedbackCard.className = 'rounded-xl p-4 md:p-5 border border-emerald-500/60 bg-emerald-950/80 text-emerald-100 transition-all';
+                feedbackIcon.className = 'w-10 h-10 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center text-xl shrink-0 mt-0.5 font-bold';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                feedbackTitle.className = 'font-bold text-base md:text-lg mb-1 text-emerald-400';
+                feedbackTitle.innerText = `Syabas! Jawapan Tepat (+${bonusPoints} BP)`;
+
+                triggerConfettiBurst();
+            } else {
+                playSound('wrong');
+                streak = 0;
+                lives--;
+                updateLivesDisplay();
+
+                feedbackCard.className = 'rounded-xl p-4 md:p-5 border border-rose-500/60 bg-rose-950/80 text-rose-100 transition-all';
+                feedbackIcon.className = 'w-10 h-10 rounded-full bg-rose-500 text-slate-950 flex items-center justify-center text-xl shrink-0 mt-0.5 font-bold';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                feedbackTitle.className = 'font-bold text-base md:text-lg mb-1 text-rose-400';
+                feedbackTitle.innerText = 'Jawapan Kurang Tepat';
+            }
+
+            feedbackExp.innerText = qData.explanation;
+            motivationText.innerText = `"${qData.motivation}"`;
+
+            feedbackCard.classList.remove('hidden');
+
+            // Check if lives ran out
+            if (lives <= 0) {
+                document.getElementById('next-question-btn').innerHTML = '<span>Tamat Nyawa - Lihat Keputusan</span><i class="fa-solid fa-arrow-right"></i>';
+            } else if (currentQuestionIdx === currentQuestionsList.length - 1) {
+                document.getElementById('next-question-btn').innerHTML = '<span>Selesaikan Tahap</span><i class="fa-solid fa-trophy"></i>';
+            } else {
+                document.getElementById('next-question-btn').innerHTML = '<span>Soalan Seterusnya</span><i class="fa-solid fa-arrow-right"></i>';
+            }
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            if (lives <= 0 || currentQuestionIdx >= currentQuestionsList.length - 1) {
+                finishLevel();
+            } else {
+                currentQuestionIdx++;
+                loadQuestion();
+            }
+        }
+
+        function finishLevel() {
+            playSound('levelComplete');
+
+            // Save Level score
+            playerProfile.levelScores[currentLevel] = Math.max(playerProfile.levelScores[currentLevel], levelScore);
+
+            // Calculate stars (3 stars = 5/5, 2 stars = 3-4/5, 1 star = 1-2/5)
+            let stars = 0;
+            if (levelScore === 5) stars = 3;
+            else if (levelScore >= 3) stars = 2;
+            else if (levelScore >= 1) stars = 1;
+
+            playerProfile.levelStars[currentLevel] = Math.max(playerProfile.levelStars[currentLevel], stars);
+
+            const isPassed = levelScore >= 3 && lives > 0;
+
+            // Unlock next level if passed
+            if (isPassed && currentLevel < 3) {
+                if (playerProfile.unlockedLevel < currentLevel + 1) {
+                    playerProfile.unlockedLevel = currentLevel + 1;
+                }
+            }
+
+            // Render Summary Screen
+            const summaryTitle = document.getElementById('summary-title');
+            const summarySubtitle = document.getElementById('summary-subtitle');
+            const summaryStatus = document.getElementById('summary-status-text');
+            const summaryNextBtn = document.getElementById('summary-next-btn');
+
+            document.getElementById('summary-score-ratio').innerText = `${levelScore} / 5`;
+            const pct = Math.round((levelScore / 5) * 100);
+            document.getElementById('summary-percentage').innerText = `${pct}%`;
+            document.getElementById('summary-level-points').innerText = `+${levelScore * 100} BP`;
+
+            // Stars HTML
+            let starsHTML = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < stars) {
+                    starsHTML += '<i class="fa-solid fa-star text-amber-400"></i>';
+                } else {
+                    starsHTML += '<i class="fa-regular fa-star text-slate-700"></i>';
+                }
+            }
+            document.getElementById('summary-stars').innerHTML = starsHTML;
+
+            if (isPassed) {
+                summaryTitle.innerText = 'Tahniah! Tahap Berjaya Dilepasi';
+                summaryTitle.className = 'font-heading text-2xl sm:text-3xl font-extrabold text-emerald-400 mb-1';
+                summarySubtitle.innerText = `Luar biasa, ${playerProfile.name}! Anda telah menunjukkan penguasaan tajuk Larangan Rasuah yang cemerlang.`;
+                summaryStatus.innerText = 'LULUS';
+                summaryStatus.className = 'text-xs font-bold text-emerald-400 uppercase mt-1 block';
+
+                if (currentLevel < 3) {
+                    summaryNextBtn.classList.remove('hidden');
+                    summaryNextBtn.innerHTML = '<span>Teruskan Ke Tahap ' + (currentLevel + 1) + '</span><i class="fa-solid fa-arrow-right"></i>';
+                } else {
+                    summaryNextBtn.classList.remove('hidden');
+                    summaryNextBtn.innerHTML = '<span>Tamatt! Lihat Pengiktirafan</span><i class="fa-solid fa-award"></i>';
+                }
+                triggerConfettiFull();
+            } else {
+                summaryTitle.innerText = 'Cuba Lagi!';
+                summaryTitle.className = 'font-heading text-2xl sm:text-3xl font-extrabold text-rose-400 mb-1';
+                summarySubtitle.innerText = 'Syarat kelulusan ialah minimum 3/5 soalan betul dengan nyawa berbaki. Jangan putus asa!';
+                summaryStatus.innerText = 'BELUM LULUS';
+                summaryStatus.className = 'text-xs font-bold text-rose-400 uppercase mt-1 block';
+
+                summaryNextBtn.innerHTML = '<span>Cuba Semula Tahap ' + currentLevel + '</span><i class="fa-solid fa-rotate-right"></i>';
+            }
+
+            showScreen('screen-summary');
+        }
+
+        function nextLevelFromSummary() {
+            if (levelScore >= 3 && lives > 0 && currentLevel < 3) {
+                startLevel(currentLevel + 1);
+            } else {
+                startLevel(currentLevel);
+            }
+        }
+
+        function goToLevelMap() {
+            playSound('click');
+            updateLevelMapUI();
+            showScreen('screen-levels');
+        }
+
+        function quitToLevels() {
+            playSound('click');
+            updateLevelMapUI();
+            showScreen('screen-levels');
+        }
+
+        function resetGameProgress() {
+            if (confirm("Adakah anda pasti mahu menetap semula (reset) semua markah dan kemajuan tahap?")) {
+                playerProfile.totalScore = 0;
+                playerProfile.unlockedLevel = 1;
+                playerProfile.levelScores = { 1: 0, 2: 0, 3: 0 };
+                playerProfile.levelStars = { 1: 0, 2: 0, 3: 0 };
+                updateLevelMapUI();
+            }
+        }
+
+        function toggleNotaModal() {
+            playSound('click');
+            const modal = document.getElementById('nota-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        // CONFETTI EFFECT SYSTEM
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function triggerConfettiBurst() {
+            for (let i = 0; i < 35; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.7) * 12,
+                    color: ['#10b981', '#34d399', '#f59e0b', '#38bdf8', '#a855f7'][Math.floor(Math.random() * 5)],
+                    size: Math.random() * 8 + 4,
+                    life: 100
+                });
+            }
+        }
+
+        function triggerConfettiFull() {
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: Math.random() * window.innerWidth,
+                    y: -10,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: Math.random() * 6 + 3,
+                    color: ['#10b981', '#34d399', '#f59e0b', '#e11d48', '#38bdf8'][Math.floor(Math.random() * 5)],
+                    size: Math.random() * 10 + 5,
+                    life: 160
+                });
+            }
+        }
+
+        function renderConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, idx) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.15; // gravity
+                p.life -= 1;
+
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0 || p.y > window.innerHeight) {
+                    particles.splice(idx, 1);
+                }
+            });
+            requestAnimationFrame(renderConfetti);
+        }
+        requestAnimationFrame(renderConfetti);
+
+    </script>
+</body>
+</html>
